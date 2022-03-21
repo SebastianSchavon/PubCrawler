@@ -1,11 +1,3 @@
-<script setup>
-defineProps({
-  startCords: [],
-  endCords: [],
-  chosenPubs: [],
-});
-</script>
-
 <script>
 import { Point, Pub } from "./Objects.vue";
 export default {
@@ -34,12 +26,12 @@ export default {
       ifPriceClass: true,
       ifImage: true,
       globalPopup: Pub,
-      // token: null,
       getNextPage: null,
       x: new Array(3),
       counter: 0,
       previousButton: document.querySelector("#previousButton"),
       nextButton: document.querySelector("#nextButton"),
+      lastAddress: null,
     };
   },
   mounted: function () {
@@ -71,7 +63,7 @@ export default {
   methods: {
     initMap() {
       this.map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 57.708870, lng: 11.974560 },
+        // center: { lat: 57.70887, lng: 11.97456 },
         zoom: 14,
         disableDefaultUI: true,
         fullscreenControl: true,
@@ -82,8 +74,6 @@ export default {
       this.googleGeoCoder = new google.maps.Geocoder();
     },
     async searchByName() {
-      this.resetPageButtons();
-
       let request = {
         address: this.placeName,
       };
@@ -96,31 +86,19 @@ export default {
         if (status == "OK") {
           const locationLatLong = results[0].geometry.location;
           self.searchByGeoLocation(locationLatLong);
+          document.querySelector(".switch-button").textContent =
+            "Pubs near " + self.placeName;
+          self.resetPageButtons();
+          //   self.lastAddress = self.placeName;
+          //   console.log(self.lastAddress)
         } else {
           self.notifyUser("No place found");
+          //   self.placeName = self.lastAddress;
+          //   console.log(self.lastAddress)
         }
       }
     },
     async searchByGeoLocation(geoLocation) {
-      // let request;
-
-      // if (this.token == null) {
-      //   console.log(this.token)
-      //   request = {
-      //     radius: "3000",
-      //     location: geoLocation,
-      //     type: "bar",
-      //   };
-      // } else {
-      //   await new Promise(r => setTimeout(r, 2000));
-      //   request = {
-      //     radius: "3000",
-      //     location: geoLocation,
-      //     type: "bar",
-      //     pageToken: this.token.m
-      //   };
-      // }
-
       let request = {
         radius: "3000",
         location: geoLocation,
@@ -132,8 +110,6 @@ export default {
       const self = this;
       function callback(results, status, pageToken) {
         self.pubs = [];
-        //pageToken innehåller en sträng som man kan skicka med i request om man vill få tillbaka 20 nästa resultat.
-        // self.token = pageToken;
 
         if (status == google.maps.places.PlacesServiceStatus.OK) {
           for (var i = 0; i < results.length; i++) {
@@ -146,17 +122,6 @@ export default {
                 ? results[i].photos[0].getUrl({ maxHeight: 1000 })
                 : self.defaultPubPic;
 
-            // const photos = [];
-            // if ("photos" in results[i]) {
-            //   for (var j = 0; j < results[i].photos.length; j++) {
-            //     photos[i] = results[i].photos[j].getUrl({ maxHeight: 100 });
-
-            //     // photos[i] =
-            //     //   "photos" in results[i]
-            //     //     ? results[i].photos[j].getUrl({ maxHeight: 100 })
-            //     //     : self.defaultPubPic;
-            //   }
-            // }
             self.pubs.push(
               new Pub(
                 point,
@@ -167,7 +132,6 @@ export default {
                 results[i].price_level,
                 results[i].user_ratings_total,
                 results[i].formatted_address
-                // photos
               )
             );
           }
@@ -206,6 +170,7 @@ export default {
         }
       }
       this.chosenArray.push(pub);
+      this.notifyUser("Pub added to crawl list");
     },
     removePub(pub) {
       for (var i = 0; i < this.chosenArray.length; i++) {
@@ -214,13 +179,6 @@ export default {
         }
       }
     },
-    // optimizeChosenArray() {
-    //   console.log(this.chosenArray)
-    //   this.chosenArray.sort((a, b) =>
-    //     a.distance > b.distance ? 1 : b.distance > a.distance ? -1 : 0
-    //   );
-    //   console.log(this.chosenArray)
-    // },
     async calculateAndDispalyRoutes(optimizeRoute = false) {
       const waypts = [];
 
@@ -283,6 +241,8 @@ export default {
         notifyUser("Geolocation is not supported by your browser");
       } else {
         navigator.geolocation.getCurrentPosition(success, error);
+        document.querySelector(".switch-button").textContent = "Pubs near you";
+        this.resetPageButtons();
       }
     },
     showAndHidePubs() {
@@ -433,8 +393,8 @@ export default {
 </script>
 
 <template>
-  <!--Denna måste heta map-->
   <section id="map-container">
+    <!-- The visual map from Googles Maps JavaScript API displays on "map"-div -->
     <div id="map"></div>
   </section>
   <section id="search-section">
@@ -507,11 +467,6 @@ export default {
         v-if="!ifImage"
         src="https://as2.ftcdn.net/v2/jpg/02/55/54/87/1000_F_255548787_NN93IpmZ29kRmNfy8OYWvSqLYSm1VCTj.jpg"
       />
-      <!-- <ul class="image-div">
-                <li v-for="p in result.photos">
-                  <img :src="p" />
-                </li>
-      </ul>-->
     </div>
   </section>
   <section id="list-section" :class="theme">
@@ -521,7 +476,7 @@ export default {
     <div id="div-list" :class="divList">
       <div id="response-list" class="list">
         <button class="switch-button" @click="nearYouButton(this)">
-          Potential places
+          Pubs near you
         </button>
         <ul>
           <li
@@ -530,7 +485,16 @@ export default {
             :class="nearyouTheme"
             aria-haspopup="true"
           >
-            <p @click="showPopup(result)">{{ result.name }}</p>
+            <div class="icon-name">
+              <i
+                v-if="chosenArray.includes(result)"
+                class="searchbar-button material-icons md48 beer-colored"
+                >done</i
+              >
+              <p class="li-name" @click="showPopup(result)">
+                {{ result.name }}
+              </p>
+            </div>
 
             <button class="add-remove-button" @click="addPub(result)">+</button>
           </li>

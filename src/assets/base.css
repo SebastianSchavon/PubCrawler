@@ -67,7 +67,7 @@ hr {
 }
 
 .minimized {
-  height: 12%;
+  height: 14%;
   transition: 0.2s;
 }
 
@@ -103,9 +103,9 @@ hr {
 }
 
 #list-section li p {
-  margin: 0;
   text-align: left;
   margin-left: 1rem;
+  
 }
 
 #list-section li p:hover {
@@ -218,6 +218,7 @@ li:nth-child(even) {
   font-size: small;
   border-radius: 0.25em;
   width: 80%;
+
 }
 
 #notification.animate {
@@ -307,7 +308,6 @@ li:nth-child(even) {
   }
 
   .minimized {
-    height: 12%;
     transition: 0.2s;
     overflow: hidden;
   }
@@ -328,8 +328,8 @@ li:nth-child(even) {
 }
 
 #chosen-list ul li p {
-  justify-self: start;
-  vertical-align: middle;
+  /* justify-self: start;
+  vertical-align: middle; */
   padding-right: 1rem;
 }
 
@@ -417,6 +417,10 @@ input:-webkit-autofill:focus {
 .price-class-b {
   color: gainsboro;
   margin: 1px;
+}
+
+.icon-name{
+  display:flex;
 }
 
 @media (min-width: 420px) {

@@ -56,6 +56,8 @@ export default {
       handler(newChosenArray) {
         const parsed = JSON.stringify(newChosenArray);
         localStorage.setItem("chosenArray", parsed);
+        console.log(this.chosenArray)
+        console.log(this.newChosenArray)
       },
       deep: true,
     },
@@ -164,7 +166,7 @@ export default {
     },
     addPub(pub) {
       for (let p of this.chosenArray) {
-        if (p === pub) {
+        if (p.name === pub.name) {
           this.notifyUser("Pub already added");
           return;
         }

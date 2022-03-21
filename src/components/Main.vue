@@ -37,7 +37,7 @@ export default {
   mounted: function () {
     previousButton.disabled = true;
 
-    for (var i = 0; i < this.x.length; i++) {
+    for (let i = 0; i < this.x.length; i++) {
       this.x[i] = new Array();
     }
 
@@ -76,7 +76,7 @@ export default {
       this.googleGeoCoder = new google.maps.Geocoder();
     },
     async searchByName() {
-      var request = {
+      let request = {
         address: this.placeName,
       };
 
@@ -101,7 +101,7 @@ export default {
       }
     },
     async searchByGeoLocation(geoLocation) {
-      var request = {
+      let request = {
         radius: "3000",
         location: geoLocation,
         type: "bar",
@@ -114,7 +114,7 @@ export default {
         self.pubs = [];
 
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-          for (var i = 0; i < results.length; i++) {
+          for (let i = 0; i < results.length; i++) {
             const point = new Point(
               results[i].geometry.location.lat(),
               results[i].geometry.location.lng()
@@ -153,7 +153,7 @@ export default {
         }
 
         //Stores each page results in an array. Store each array in an array.
-        for (var i = 0; i < self.pubs.length; i++) {
+        for (let i = 0; i < self.pubs.length; i++) {
           self.x[self.counter].push(self.pubs[i]);
         }
 
@@ -165,7 +165,7 @@ export default {
       this.map.panTo(location);
     },
     addPub(pub) {
-      for (var p of this.chosenArray) {
+      for (let p of this.chosenArray) {
         if (p.name === pub.name) {
           this.notifyUser("Pub already added");
           return;
@@ -175,7 +175,7 @@ export default {
       this.notifyUser("Pub added to crawl list");
     },
     removePub(pub) {
-      for (var i = 0; i < this.chosenArray.length; i++) {
+      for (let i = 0; i < this.chosenArray.length; i++) {
         if (this.chosenArray[i] === pub) {
           this.chosenArray.splice(i, 1);
         }
@@ -184,7 +184,7 @@ export default {
     async calculateAndDispalyRoutes(optimizeRoute = false) {
       const waypts = [];
 
-      for (var i = 1; i < this.chosenArray.length - 1; i++) {
+      for (let i = 1; i < this.chosenArray.length - 1; i++) {
         waypts.push({
           location: { placeId: this.chosenArray[i].googleId },
           stopover: true,
@@ -203,15 +203,15 @@ export default {
         })
         .then((response) => {
           if (optimizeRoute) {
-            for (var i = 1; i < response.geocoded_waypoints.length - 1; i++) {
-              var from = self.chosenArray.findIndex(
+            for (let i = 1; i < response.geocoded_waypoints.length - 1; i++) {
+              let from = self.chosenArray.findIndex(
                 (elem) =>
                   elem.googleId === response.geocoded_waypoints[i].place_id
               );
               self.moveItem(from, i);
             }
           }
-          for (var i = 0; i < response.routes[0].legs.length; i++) {
+          for (let i = 0; i < response.routes[0].legs.length; i++) {
             response.routes[0].legs[i].end_address =
               self.chosenArray[i + 1].name;
             response.routes[0].legs[i].start_address = self.chosenArray[i].name;
@@ -223,7 +223,7 @@ export default {
         });
     },
     geoLocate() {
-      var self = this;
+      let self = this;
 
       function success(position) {
         position = new Point(
@@ -382,7 +382,7 @@ export default {
       console.log(this.x);
       this.counter = 0;
 
-      for (var i = 0; i < this.x.length; i++) {
+      for (let i = 0; i < this.x.length; i++) {
         this.x[i] = [];
       }
 

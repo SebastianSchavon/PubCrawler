@@ -76,7 +76,7 @@ export default {
       this.googleGeoCoder = new google.maps.Geocoder();
     },
     async searchByName() {
-      let request = {
+      var request = {
         address: this.placeName,
       };
 
@@ -101,7 +101,7 @@ export default {
       }
     },
     async searchByGeoLocation(geoLocation) {
-      let request = {
+      var request = {
         radius: "3000",
         location: geoLocation,
         type: "bar",
@@ -165,7 +165,7 @@ export default {
       this.map.panTo(location);
     },
     addPub(pub) {
-      for (let p of this.chosenArray) {
+      for (var p of this.chosenArray) {
         if (p.name === pub.name) {
           this.notifyUser("Pub already added");
           return;
@@ -184,7 +184,7 @@ export default {
     async calculateAndDispalyRoutes(optimizeRoute = false) {
       const waypts = [];
 
-      for (let i = 1; i < this.chosenArray.length - 1; i++) {
+      for (var i = 1; i < this.chosenArray.length - 1; i++) {
         waypts.push({
           location: { placeId: this.chosenArray[i].googleId },
           stopover: true,
@@ -203,15 +203,15 @@ export default {
         })
         .then((response) => {
           if (optimizeRoute) {
-            for (let i = 1; i < response.geocoded_waypoints.length - 1; i++) {
-              let from = self.chosenArray.findIndex(
+            for (var i = 1; i < response.geocoded_waypoints.length - 1; i++) {
+              var from = self.chosenArray.findIndex(
                 (elem) =>
                   elem.googleId === response.geocoded_waypoints[i].place_id
               );
               self.moveItem(from, i);
             }
           }
-          for (let i = 0; i < response.routes[0].legs.length; i++) {
+          for (var i = 0; i < response.routes[0].legs.length; i++) {
             response.routes[0].legs[i].end_address =
               self.chosenArray[i + 1].name;
             response.routes[0].legs[i].start_address = self.chosenArray[i].name;

@@ -385,6 +385,13 @@ li:nth-child(even) {
   border: 1px solid #ec9d00;
   border-radius: 0.25em;
   background-color: transparent;
+  margin-left: 0.5rem ;
+  margin-right: 0.5rem;
+
+}
+
+.menuButton:hover{
+  background-color: #f6f6f6;
 }
 
 #list-section button:hover{

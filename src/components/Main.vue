@@ -35,13 +35,6 @@ export default {
     };
   },
   mounted: function () {
-    console.log(this.x);
-
-    // // Define an array in each element of the x array
-    // for (let i = 0; i < this.x.length; i++) {
-    //   this.x[i] = new Array();
-    // }
-
     this.initMap();
     this.geoLocate();
 
@@ -165,8 +158,7 @@ export default {
         for (let i = 0; i < self.pubs.length; i++) {
           self.x[self.counter].push(self.pubs[i]);
         }
-        console.log(self.x);
-        console.log(self.counter);
+        
       }
       this.moveMapTo(geoLocation);
     },
@@ -181,7 +173,7 @@ export default {
         }
       }
       this.chosenArray.push(pub);
-      console.log(this.chosenArray);
+      
       this.notifyUser("Pub added to crawl list");
     },
     removePub(pub) {
@@ -356,21 +348,6 @@ export default {
       if (pos === this.chosenArray.length) return;
       this.moveItem(pos, pos + 1);
     },
-    previousPage() {
-      this.counter--;
-
-      // if (this.counter < 2) {
-      //   nextButton.disabled = false;
-      // } else {
-      //   nextButton.disabled = true;
-      // }
-
-      // if (this.counter > 0) {
-      //   previousButton.disabled = false;
-      // } else {
-      //   previousButton.disabled = true;
-      // }
-    },
     nextPage() {
       if (this.x[this.counter + 1].length > 0) {
         this.counter++;
@@ -379,18 +356,7 @@ export default {
           this.getNextPage();
         }
       }
-
-      // if (this.counter > 0) {
-      //   previousButton.disabled = false;
-      // } else {
-      //   previousButton.disabled = true;
-      // }
-
-      // if (this.counter < 2) {
-      //   nextButton.disabled = false;
-      // } else {
-      //   nextButton.disabled = true;
-      // }
+      
     },
     resetPageButtons() {
       this.counter = 0;
@@ -398,9 +364,6 @@ export default {
       for (let i = 0; i < this.x.length; i++) {
         this.x[i] = [];
       }
-
-      // nextButton.disabled = false;
-      // previousButton.disabled = true;
     },
   },
 };
@@ -516,7 +479,7 @@ export default {
         <div>
           <button
             v-bind:disabled="counter == 0"
-            @click="previousPage()"
+            @click="counter--"
             id="previousButton"
             class="menuButton"
           >
@@ -524,7 +487,9 @@ export default {
           </button>
           <button
             @click="nextPage()"
-            v-bind:disabled="!x[counter + 1] && !getNextPage"
+            v-bind:disabled="
+              !x[counter + 1] || (x[counter + 1]?.length < 1 && !getNextPage)
+            "
             id="nextButton"
             class="menuButton"
           >

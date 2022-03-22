@@ -31,7 +31,7 @@ export default {
       counter: 0,
       previousButton: document.querySelector("#previousButton"),
       nextButton: document.querySelector("#nextButton"),
-      lastAddress: null,
+      lastAddress: null
     };
   },
   mounted: function () {
@@ -45,9 +45,23 @@ export default {
     this.geoLocate();
     if (localStorage.getItem("chosenArray")) {
       try {
-        this.chosenArray = JSON.parse(localStorage.getItem("chosenArray"));
+        let temp = JSON.parse(localStorage.getItem("chosenArray"));
+        for(let i = 0; i < temp.length; i++){
+          this.chosenArray[i] = new Pub(
+                temp[i].location,
+                temp[i].googleId,
+                temp[i].name,
+                temp[i].imgSrc,
+                temp[i].rating,
+                temp[i].priceClass,
+                temp[i].userRatings,
+                temp[i].address
+              )
+        }
+        
       } catch (e) {
         localStorage.removeItem("chosenArray");
+        
       }
     }
   },
@@ -56,8 +70,6 @@ export default {
       handler(newChosenArray) {
         const parsed = JSON.stringify(newChosenArray);
         localStorage.setItem("chosenArray", parsed);
-        console.log(this.chosenArray)
-        console.log(this.newChosenArray)
       },
       deep: true,
     },
@@ -91,12 +103,8 @@ export default {
           document.querySelector(".switch-button").textContent =
             "Pubs near " + self.placeName;
           self.resetPageButtons();
-          //   self.lastAddress = self.placeName;
-          //   console.log(self.lastAddress)
         } else {
           self.notifyUser("No place found");
-          //   self.placeName = self.lastAddress;
-          //   console.log(self.lastAddress)
         }
       }
     },
@@ -144,7 +152,6 @@ export default {
               pageToken.nextPage();
 
               self.counter++;
-              console.log(self.counter);
             };
           } else {
             self.getNextPage = null;
@@ -156,8 +163,6 @@ export default {
         for (let i = 0; i < self.pubs.length; i++) {
           self.x[self.counter].push(self.pubs[i]);
         }
-
-        console.log(self.x);
       }
       this.moveMapTo(geoLocation);
     },
@@ -172,6 +177,7 @@ export default {
         }
       }
       this.chosenArray.push(pub);
+      console.log(this.chosenArray)
       this.notifyUser("Pub added to crawl list");
     },
     removePub(pub) {
@@ -344,7 +350,6 @@ export default {
     },
     previousPage() {
       this.counter--;
-      console.log(this.counter);
 
       if (this.counter < 2) {
         nextButton.disabled = false;
@@ -379,7 +384,6 @@ export default {
       }
     },
     resetPageButtons() {
-      console.log(this.x);
       this.counter = 0;
 
       for (let i = 0; i < this.x.length; i++) {
@@ -388,7 +392,6 @@ export default {
 
       nextButton.disabled = false;
       previousButton.disabled = true;
-      console.log(this.x);
     },
   },
 };

@@ -1,14 +1,14 @@
 <script>
 import { Point, Pub } from "./Objects.vue";
 export default {
-  emits: ["addPub"],
+  // emits: ["addPub"],
   data: function () {
     return {
-      pubs: [],
-      originPosition: null,
-      defaultPubPic: "",
-      chosenArray: [],
-      viewPubs: false,
+      pubs: [], //stores all the pub objects from the API response
+      // originPosition: null,
+      // defaultPubPic: "", //remove?
+      chosenArray: [], //stores all the pub objects chosen by the user
+      // viewPubs: false,
       map: null,
       googleSearchService: null,
       googleGeoCoder: null,
@@ -16,22 +16,22 @@ export default {
         preserveViewport: true,
       }),
       directionsService: new google.maps.DirectionsService(),
-      pubListVisible: true,
-      theme: "minimized",
-      divList: "show-potentials",
-      nearyouTheme: "closed",
-      chosenTheme: "closed",
-      popupTheme: true,
-      ifRating: true,
-      ifPriceClass: true,
-      ifImage: true,
-      globalPopup: Pub,
-      getNextPage: null,
-      x: new Array(3),
-      counter: 0,
+      pubListVisible: true, //used to control the textcontet of the HIDE/SHOW button
+      theme: "minimized", //toggle list-sections minimized/maximized state
+      divList: "show-potentials", //toggle between the 'near you' and 'chosen' divs
+      nearyouTheme: "closed",//show/hidden state of menubuttons in the 'Pubs near you' div
+      chosenTheme: "closed", //show/hidden state of menubuttons in the 'Chosen list' div
+      popupTheme: true, //show/hidden state of popup div
+      ifRating: true, //if API response contains rating 
+      ifPriceClass: true, //if API response containts a price class
+      ifImage: true, //if API response contains image 
+      globalPopup: Pub, //Popup div to display clicked pub information
+      getNextPage: null, //store 'Next Page Token' from API response
+      x: new Array(3), //stores each page from API response
+      counter: 0, //control which of the arrays in x-array to manipulate/display
       previousButton: document.querySelector("#previousButton"),
       nextButton: document.querySelector("#nextButton"),
-      lastAddress: null
+      // lastAddress: null,
     };
   },
   mounted: function () {
@@ -43,25 +43,24 @@ export default {
 
     this.initMap();
     this.geoLocate();
+    
     if (localStorage.getItem("chosenArray")) {
       try {
         let temp = JSON.parse(localStorage.getItem("chosenArray"));
-        for(let i = 0; i < temp.length; i++){
+        for (let i = 0; i < temp.length; i++) {
           this.chosenArray[i] = new Pub(
-                temp[i].location,
-                temp[i].googleId,
-                temp[i].name,
-                temp[i].imgSrc,
-                temp[i].rating,
-                temp[i].priceClass,
-                temp[i].userRatings,
-                temp[i].address
-              )
+            temp[i].location,
+            temp[i].googleId,
+            temp[i].name,
+            temp[i].imgSrc,
+            temp[i].rating,
+            temp[i].priceClass,
+            temp[i].userRatings,
+            temp[i].address
+          );
         }
-        
       } catch (e) {
         localStorage.removeItem("chosenArray");
-        
       }
     }
   },
@@ -177,7 +176,7 @@ export default {
         }
       }
       this.chosenArray.push(pub);
-      console.log(this.chosenArray)
+      console.log(this.chosenArray);
       this.notifyUser("Pub added to crawl list");
     },
     removePub(pub) {
@@ -228,6 +227,10 @@ export default {
           this.directionsRenderer.setDirections(response);
         });
     },
+    removeRoute() {
+      //Clear route from map
+      this.directionsRenderer.set('directions', null);
+    },
     geoLocate() {
       let self = this;
 
@@ -236,7 +239,7 @@ export default {
           position.coords.latitude,
           position.coords.longitude
         );
-        self.originPosition = position;
+        // self.originPosition = position;
         self.moveMapTo(position);
         self.searchByGeoLocation(position);
       }
@@ -492,7 +495,7 @@ export default {
           >
             <div class="icon-name">
               <i
-                v-if="chosenArray.includes(result)"
+                v-if="chosenArray.some(x => x.name == result.name)"
                 class="searchbar-button material-icons md48 beer-colored"
                 >done</i
               >
@@ -527,6 +530,7 @@ export default {
             class="menuButton hidden"
             type="button"
             @click.prevent="calculateAndDispalyRoutes(false)"
+            title="Display pub crawl route"
           >
             Show Route
           </button>
@@ -535,8 +539,17 @@ export default {
             class="menuButton hidden"
             type="button"
             @click.prevent="calculateAndDispalyRoutes(true)"
+            title="Optimize walking route between the pubs which is not start or end-pubs"
           >
-            Optimize Route
+            Optimize 
+          </button>
+          <button 
+          id="switch-4"
+          class="menuButton hidden"
+          @click="removeRoute()"
+          title="Remove displayed route from map"
+          >
+            Remove 
           </button>
         </div>
         <ul>

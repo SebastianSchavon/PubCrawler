@@ -4,10 +4,10 @@ export default {
   // emits: ["addPub"],
   data: function () {
     return {
-      pubs: [], //stores all the pub objects from the API response
+      pubs: [], // Stores all the pub objects from the API response
       // originPosition: null,
       // defaultPubPic: "", //remove?
-      chosenArray: [], //stores all the pub objects chosen by the user
+      chosenArray: [], // Stores all the pub objects chosen by the user
       // viewPubs: false,
       map: null,
       googleSearchService: null,
@@ -16,34 +16,35 @@ export default {
         preserveViewport: true,
       }),
       directionsService: new google.maps.DirectionsService(),
-      pubListVisible: true, //used to control the textcontet of the HIDE/SHOW button
-      theme: "minimized", //toggle list-sections minimized/maximized state
-      divList: "show-potentials", //toggle between the 'near you' and 'chosen' divs
-      nearyouTheme: "closed",//show/hidden state of menubuttons in the 'Pubs near you' div
-      chosenTheme: "closed", //show/hidden state of menubuttons in the 'Chosen list' div
-      popupTheme: true, //show/hidden state of popup div
-      ifRating: true, //if API response contains rating 
-      ifPriceClass: true, //if API response containts a price class
-      ifImage: true, //if API response contains image 
-      globalPopup: Pub, //Popup div to display clicked pub information
-      getNextPage: null, //store 'Next Page Token' from API response
-      x: new Array(3), //stores each page from API response
-      counter: 0, //control which of the arrays in x-array to manipulate/display
+      pubListVisible: true, // Used to control the textcontet of the HIDE/SHOW button
+      theme: "minimized", // Toggle list-sections minimized/maximized state
+      divList: "show-potentials", // Toggle between the 'near you' and 'chosen' divs
+      nearyouTheme: "closed", // Show/hidden state of menubuttons in the 'Pubs near you' div
+      chosenTheme: "closed", // Show/hidden state of menubuttons in the 'Chosen list' div
+      popupTheme: true, // Show/hidden state of popup div
+      ifRating: true, // If API response contains rating
+      ifPriceClass: true, // If API response containts a price class
+      ifImage: true, // If API response contains image
+      globalPopup: Pub, // Popup div to display clicked pub information
+      getNextPage: null, // Store 'Next Page Token' from API response
+      x: new Array(3), // Stores each page from API response
+      counter: 0, // Control which of the arrays in x-array to manipulate/display
       previousButton: document.querySelector("#previousButton"),
       nextButton: document.querySelector("#nextButton"),
       // lastAddress: null,
     };
   },
   mounted: function () {
-    previousButton.disabled = true;
+    console.log(this.x);
 
-    for (let i = 0; i < this.x.length; i++) {
-      this.x[i] = new Array();
-    }
+    // // Define an array in each element of the x array
+    // for (let i = 0; i < this.x.length; i++) {
+    //   this.x[i] = new Array();
+    // }
 
     this.initMap();
     this.geoLocate();
-    
+
     if (localStorage.getItem("chosenArray")) {
       try {
         let temp = JSON.parse(localStorage.getItem("chosenArray"));
@@ -91,7 +92,7 @@ export default {
         address: this.placeName,
       };
 
-      //Converts the seach string to a geolocation
+      // Converts the seach string to a geolocation
       this.googleGeoCoder.geocode(request, callback);
 
       const self = this;
@@ -99,6 +100,7 @@ export default {
         if (status == "OK") {
           const locationLatLong = results[0].geometry.location;
           self.searchByGeoLocation(locationLatLong);
+
           document.querySelector(".switch-button").textContent =
             "Pubs near " + self.placeName;
           self.resetPageButtons();
@@ -158,10 +160,13 @@ export default {
           self.nearYouButton();
         }
 
-        //Stores each page results in an array. Store each array in an array.
+        // self.x[self.counter] = new Array;
+        // Stores each page results in an array. Store each array in an array.
         for (let i = 0; i < self.pubs.length; i++) {
           self.x[self.counter].push(self.pubs[i]);
         }
+        console.log(self.x);
+        console.log(self.counter);
       }
       this.moveMapTo(geoLocation);
     },
@@ -228,8 +233,8 @@ export default {
         });
     },
     removeRoute() {
-      //Clear route from map
-      this.directionsRenderer.set('directions', null);
+      // Clear route from map
+      this.directionsRenderer.set("directions", null);
     },
     geoLocate() {
       let self = this;
@@ -354,17 +359,17 @@ export default {
     previousPage() {
       this.counter--;
 
-      if (this.counter < 2) {
-        nextButton.disabled = false;
-      } else {
-        nextButton.disabled = true;
-      }
+      // if (this.counter < 2) {
+      //   nextButton.disabled = false;
+      // } else {
+      //   nextButton.disabled = true;
+      // }
 
-      if (this.counter > 0) {
-        previousButton.disabled = false;
-      } else {
-        previousButton.disabled = true;
-      }
+      // if (this.counter > 0) {
+      //   previousButton.disabled = false;
+      // } else {
+      //   previousButton.disabled = true;
+      // }
     },
     nextPage() {
       if (this.x[this.counter + 1].length > 0) {
@@ -374,17 +379,18 @@ export default {
           this.getNextPage();
         }
       }
-      if (this.counter > 0) {
-        previousButton.disabled = false;
-      } else {
-        previousButton.disabled = true;
-      }
 
-      if (this.counter < 2) {
-        nextButton.disabled = false;
-      } else {
-        nextButton.disabled = true;
-      }
+      // if (this.counter > 0) {
+      //   previousButton.disabled = false;
+      // } else {
+      //   previousButton.disabled = true;
+      // }
+
+      // if (this.counter < 2) {
+      //   nextButton.disabled = false;
+      // } else {
+      //   nextButton.disabled = true;
+      // }
     },
     resetPageButtons() {
       this.counter = 0;
@@ -393,8 +399,8 @@ export default {
         this.x[i] = [];
       }
 
-      nextButton.disabled = false;
-      previousButton.disabled = true;
+      // nextButton.disabled = false;
+      // previousButton.disabled = true;
     },
   },
 };
@@ -402,7 +408,7 @@ export default {
 
 <template>
   <section id="map-container">
-    <!-- The visual map from Googles Maps JavaScript API displays on "map"-div -->
+    <!-- Div which is referenced in the API methods. Needs to be defined as "map" -->
     <div id="map"></div>
   </section>
   <section id="search-section">
@@ -495,7 +501,7 @@ export default {
           >
             <div class="icon-name">
               <i
-                v-if="chosenArray.some(x => x.name == result.name)"
+                v-if="chosenArray.some((x) => x.name == result.name)"
                 class="searchbar-button material-icons md48 beer-colored"
                 >done</i
               >
@@ -509,13 +515,19 @@ export default {
         </ul>
         <div>
           <button
+            v-bind:disabled="counter == 0"
             @click="previousPage()"
             id="previousButton"
             class="menuButton"
           >
             Previous
           </button>
-          <button @click="nextPage()" id="nextButton" class="menuButton">
+          <button
+            @click="nextPage()"
+            v-bind:disabled="!x[counter + 1] && !getNextPage"
+            id="nextButton"
+            class="menuButton"
+          >
             Next
           </button>
         </div>
@@ -541,15 +553,15 @@ export default {
             @click.prevent="calculateAndDispalyRoutes(true)"
             title="Optimize walking route between the pubs which is not start or end-pubs"
           >
-            Optimize 
+            Optimize
           </button>
-          <button 
-          id="switch-4"
-          class="menuButton hidden"
-          @click="removeRoute()"
-          title="Remove displayed route from map"
+          <button
+            id="switch-4"
+            class="menuButton hidden"
+            @click="removeRoute()"
+            title="Remove displayed route from map"
           >
-            Remove 
+            Remove
           </button>
         </div>
         <ul>

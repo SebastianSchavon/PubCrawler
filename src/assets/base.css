@@ -38,11 +38,11 @@ hr {
   cursor: pointer;
 }
 
-.open {
+/* .open {
   justify-content: space-between;
   display: flex;
   flex-direction: row;
-}
+} */
 .closed {
   display: none !important;
 }
@@ -98,7 +98,12 @@ hr {
   padding: 0;
 }
 
+
+
 #list-section li {
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
   padding: 0.2em 0;
 }
 
@@ -159,7 +164,8 @@ li:nth-child(even) {
   width: 100%;
   max-width: 30em;
   border-radius: 5px;
-  background-color: rgba(243, 243, 249, 0.7);
+  /* background-color: rgba(243, 243, 249, 0.7); */
+  background-color: white;
   border: 1px solid grey;
   box-shadow: 2px 2px 5px gray;
 }
@@ -208,9 +214,9 @@ li:nth-child(even) {
   font-weight: 800;
 }
 
-.hidden {
+/* .hidden {
   display: none;
-}
+} */
 
 #notification {
   background-color: rgb(236 157 0 / 60%);
@@ -250,9 +256,114 @@ li:nth-child(even) {
 
 #chosen-list .order-pubs {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  /* column-gap: 1em; */
+}
+
+#chosen-list ul li {
+  display: grid;
+  grid-template-columns: 3fr 1fr 0.5fr;
+}
+
+#chosen-list ul li p {
+  padding-right: 1rem;
+}
+
+#chosen-list ul li:last-child div:before {
+  content: "End";
+  font-family: "Playfair Display", serif;
+}
+
+#chosen-list ul li:first-child div:before {
+  content: "Start";
+  font-family: "Playfair Display", serif;
+}
+
+.popup {
+  padding: 10px;
+  background-color: #fefefe;
+  z-index: 1;
+  border-radius: 16px;
+  -webkit-box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.popup img {
+  max-width: 90%;
+  min-width: 90%;
+
+  max-height: 90%;
+  min-height: 90%;
+
+  margin: 1rem;
+  object-fit: cover;
+  border-radius: 16px;
+  -webkit-box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.menuButton {
+  border: 0;
+
+  color: orange;
+  border-radius: 25%;
+  background: transparent;
+  margin: 5px;
+  overflow: auto;
+}
+
+.menuButton:disabled,
+button[disabled]{
+  border: 0;
+  background: transparent;
+  opacity: 30%;
+}
+
+.menuButton:hover{
+  background-color: #f6f6f6;
+}
+
+#list-section button:hover{
+  cursor: pointer;
+}
+
+#popup-section {
+  height: 100vh;
+  width: 100vw;
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.popup-close-button {
+  border: 0;
+  background: transparent;
+  color: orange;
+  font-size: 140%;
+}
+
+#star-not-checked {
+  color: gainsboro;
+}
+
+/* Disables input-fields background-color change during search-history display  */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+.price-class-a {
+  margin: 1px;
+  color: green;
+}
+.price-class-b {
+  color: gainsboro;
+  margin: 1px;
+}
+
+.icon-name{
+  display:flex;
 }
 
 @media (max-width: 550px) {
@@ -262,7 +373,6 @@ li:nth-child(even) {
     justify-content: flex-end;
     align-items: center;
     width: 40%;
-    /* column-gap: 1em; */
   }
 
   #switch-buttons {
@@ -321,7 +431,7 @@ li:nth-child(even) {
   }
 
   .maximized {
-    height: 70%;
+    height: 66%;
     transition: 0.2s;
   }
 
@@ -329,115 +439,6 @@ li:nth-child(even) {
     margin: 0;
   }
 }
-
-#chosen-list ul li {
-  display: grid;
-  grid-template-columns: 3fr 1fr 1fr;
-}
-
-#chosen-list ul li p {
-  /* justify-self: start;
-  vertical-align: middle; */
-  padding-right: 1rem;
-}
-
-#chosen-list ul li:last-child div:before {
-  content: "End";
-  font-family: "Playfair Display", serif;
-}
-
-#chosen-list ul li:first-child div:before {
-  content: "Start";
-  font-family: "Playfair Display", serif;
-}
-
-.popup {
-  /*display: inline;
-
-  /*max-height: auto;
-  min-height: 30vh;
-  max-width: 50vw;
-  min-width: 80vw;*/
-
-  padding: 10px;
-  background-color: #fefefe;
-  z-index: 1;
-  border-radius: 16px;
-  -webkit-box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
-}
-
-.popup img {
-  max-width: 90%;
-  min-width: 90%;
-
-  max-height: 90%;
-  min-height: 90%;
-
-  margin: 1rem;
-  object-fit: cover;
-  border-radius: 16px;
-  -webkit-box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5);
-}
-
-.menuButton {
-  border: 1px solid #ec9d00;
-  border-radius: 0.25em;
-  background-color: transparent;
-  margin-left: 0.5rem ;
-  margin-right: 0.5rem;
-
-}
-
-.menuButton:hover{
-  background-color: #f6f6f6;
-}
-
-#list-section button:hover{
-  cursor: pointer;
-}
-
-#popup-section {
-  height: 100vh;
-  width: 100vw;
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-}
-
-.popup-close-button {
-  border: 0;
-  background: transparent;
-  color: orange;
-  font-size: 140%;
-}
-
-#star-not-checked {
-  color: gainsboro;
-}
-
-/* Ser till att bakgrundsfärgen i sökrutan inte ändras vid historik-val */
-input:-webkit-autofill,
-input:-webkit-autofill:focus {
-  transition: background-color 600000s 0s, color 600000s 0s;
-}
-
-.price-class-a {
-  margin: 1px;
-  color: green;
-}
-.price-class-b {
-  color: gainsboro;
-  margin: 1px;
-}
-
-.icon-name{
-  display:flex;
-}
-
 
 @media (min-width: 420px) {
   .popup img {
@@ -452,7 +453,7 @@ input:-webkit-autofill:focus {
   }
 }
 
-/* 70rem är då list-section inte längre sträcker sig över hela skärmens width */
+/* Shadow applied to list-section when section-width != screen-width */
 @media (min-width: 70rem) {
   #list-section {
     -webkit-box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.5);

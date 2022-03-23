@@ -21,17 +21,18 @@ export default {
       divList: "show-potentials", // Toggle between the 'near you' and 'chosen' divs
       nearyouTheme: "closed", // Show/hidden state of menubuttons in the 'Pubs near you' div
       chosenTheme: "closed", // Show/hidden state of menubuttons in the 'Chosen list' div
-      popupTheme: true, // Show/hidden state of popup div
-      ifRating: true, // If API response contains rating
-      ifPriceClass: true, // If API response containts a price class
-      ifImage: true, // If API response contains image
+      popupTheme: true, // Controls v-if on popup div
+      ifRatingExists: true, // If API response contains rating
+      ifPriceExists: true, // If API response containts a price class
+      ifImageExists: true, // If API response contains image
       globalPopup: Pub, // Popup div to display clicked pub information
       getNextPage: null, // Store 'Next Page Token' from API response
-      x: new Array(3), // Stores each page from API response
-      counter: 0, // Control which of the arrays in x-array to manipulate/display
-      previousButton: document.querySelector("#previousButton"),
-      nextButton: document.querySelector("#nextButton"),
+      pageArray: new Array(3), // Stores each page from API response
+      pageCounter: 0, // Control which of the arrays in x-array to manipulate/display
+      // previousButton: document.querySelector("#previousButton"),
+      // nextButton: document.querySelector("#nextButton"),
       // lastAddress: null,
+      hidden: true, // Controls v-if on menubuttons
     };
   },
   mounted: function () {
@@ -145,7 +146,7 @@ export default {
               // Note: nextPage will call the same handler function as the initial call
               pageToken.nextPage();
 
-              self.counter++;
+              self.pageCounter++;
             };
           } else {
             self.getNextPage = null;
@@ -153,12 +154,11 @@ export default {
           self.nearYouButton();
         }
 
-        // self.x[self.counter] = new Array;
+        // self.x[self.pageCounter] = new Array;
         // Stores each page results in an array. Store each array in an array.
         for (let i = 0; i < self.pubs.length; i++) {
-          self.x[self.counter].push(self.pubs[i]);
+          self.pageArray[self.pageCounter].push(self.pubs[i]);
         }
-        
       }
       this.moveMapTo(geoLocation);
     },
@@ -173,7 +173,7 @@ export default {
         }
       }
       this.chosenArray.push(pub);
-      
+
       this.notifyUser("Pub added to crawl list");
     },
     removePub(pub) {
@@ -275,29 +275,34 @@ export default {
       this.divList = "show-potentials";
       document.querySelector("#response-list").classList.add("selected-list");
       document.querySelector("#chosen-list").classList.remove("selected-list");
-      document
-        .querySelectorAll("#chosen-list .menuButton")
-        .forEach((e) => e.classList.add("hidden"));
-      document
-        .querySelectorAll("#response-list .menuButton")
-        .forEach((e) => e.classList.remove("hidden"));
+
+      this.hidden = false;
+
+      // document
+      //   .querySelectorAll("#chosen-list .menuButton")
+      //   .forEach((e) => e.classList.add("hidden"));
+      // document
+      //   .querySelectorAll("#response-list .menuButton")
+      //   .forEach((e) => e.classList.remove("hidden"));
 
       this.chosenTheme = "closed";
       this.nearyouTheme = "open";
     },
     chosenButton() {
+      this.hidden = true;
+
       this.forceShowPubs();
       this.divList = "show-chosenones";
       document
         .querySelector("#response-list")
         .classList.remove("selected-list");
       document.querySelector("#chosen-list").classList.add("selected-list");
-      document
-        .querySelectorAll(".menuButton")
-        .forEach((e) => e.classList.remove("hidden"));
-      document
-        .querySelectorAll("#response-list .menuButton")
-        .forEach((e) => e.classList.add("hidden"));
+      // document
+      //   .querySelectorAll(".menuButton")
+      //   .forEach((e) => e.classList.remove("hidden"));
+      // document
+      //   .querySelectorAll("#response-list .menuButton")
+      //   .forEach((e) => e.classList.add("hidden"));
 
       this.chosenTheme = "open";
       this.nearyouTheme = "closed";
@@ -317,22 +322,22 @@ export default {
       this.popupTheme = false;
 
       if (result.userRatings == 0) {
-        this.ifRating = false;
+        this.ifRatingExists = false;
       }
 
       if (result.priceClass == undefined) {
-        this.ifPriceClass = false;
+        this.ifPriceExists = false;
       }
 
-      if (result.imgSrc == "") {
-        this.ifImage = false;
+      if (result.imgSrc == undefined) {
+        this.ifImageExists = false;
       }
     },
     hidePopup() {
       this.popupTheme = true;
-      this.ifRating = true;
-      this.ifPriceClass = true;
-      this.ifImage = true;
+      this.ifRatingExists = true;
+      this.ifPriceExists = true;
+      this.ifImageExists = true;
     },
     moveItem(from, to) {
       const f = this.chosenArray.splice(from, 1)[0];
@@ -349,20 +354,19 @@ export default {
       this.moveItem(pos, pos + 1);
     },
     nextPage() {
-      if (this.x[this.counter + 1].length > 0) {
-        this.counter++;
+      if (this.pageArray[this.pageCounter + 1].length > 0) {
+        this.pageCounter++;
       } else {
         if (this.getNextPage) {
           this.getNextPage();
         }
       }
-      
     },
     resetPageButtons() {
-      this.counter = 0;
+      this.pageCounter = 0;
 
-      for (let i = 0; i < this.x.length; i++) {
-        this.x[i] = [];
+      for (let i = 0; i < this.pageArray.length; i++) {
+        this.pageArray[i] = [];
       }
     },
   },
@@ -407,8 +411,8 @@ export default {
         <strong>{{ globalPopup.name }}</strong>
       </p>
       <p>{{ globalPopup.address }}</p>
-      <div v-if="!ifPriceClass">No price class...</div>
-      <div v-if="ifPriceClass" class="starDiv">
+      <div v-if="!ifPriceExists">No price class...</div>
+      <div v-if="ifPriceExists" class="starDiv">
         Price class:
         <div
           class="price-class-a"
@@ -427,8 +431,8 @@ export default {
       </div>
       <hr />
 
-      <div v-if="!ifRating">No rating...</div>
-      <div v-if="ifRating" class="starDiv">
+      <div v-if="!ifRatingExists">No rating...</div>
+      <div v-if="ifRatingExists" class="starDiv">
         Rating:
         <div v-for="index in Math.floor(globalPopup.rating)" :key="index">
           <span class="fa fa-star checked"></span>
@@ -439,9 +443,9 @@ export default {
       </div>
 
       <p>Number of ratings: {{ globalPopup.userRatings }}</p>
-      <img v-if="ifImage" :src="globalPopup.imgSrc" />
+      <img v-if="ifImageExists" :src="globalPopup.imgSrc" />
       <img
-        v-if="!ifImage"
+        v-if="!ifImageExists"
         src="https://as2.ftcdn.net/v2/jpg/02/55/54/87/1000_F_255548787_NN93IpmZ29kRmNfy8OYWvSqLYSm1VCTj.jpg"
       />
     </div>
@@ -455,13 +459,8 @@ export default {
         <button class="switch-button" @click="nearYouButton(this)">
           Pubs near you
         </button>
-        <ul>
-          <li
-            v-for="result in x[counter]"
-            :key="result.name"
-            :class="nearyouTheme"
-            aria-haspopup="true"
-          >
+        <ul v-if="!hidden">
+          <li v-for="result in pageArray[pageCounter]" :key="result.name">
             <div class="icon-name">
               <i
                 v-if="chosenArray.some((x) => x.name == result.name)"
@@ -476,24 +475,31 @@ export default {
             <button class="add-remove-button" @click="addPub(result)">+</button>
           </li>
         </ul>
-        <div>
+        <div v-if="theme == 'maximized'">
           <button
-            v-bind:disabled="counter == 0"
-            @click="counter--"
+            v-if="!hidden"
+            v-bind:disabled="pageCounter == 0"
+            @click="pageCounter--"
             id="previousButton"
             class="menuButton"
           >
-            Previous
+           <span class="material-icons-outlined">
+chevron_left
+</span>
           </button>
           <button
+            v-if="!hidden"
             @click="nextPage()"
             v-bind:disabled="
-              !x[counter + 1] || (x[counter + 1]?.length < 1 && !getNextPage)
+              !pageArray[pageCounter + 1] ||
+              (pageArray[pageCounter + 1]?.length < 1 && !getNextPage)
             "
             id="nextButton"
             class="menuButton"
           >
-            Next
+            <span class="material-icons-outlined">
+chevron_right
+</span>
           </button>
         </div>
       </div>
@@ -502,39 +508,9 @@ export default {
           <button id="switch-1" class="switch-button" @click="chosenButton()">
             Planned Crawl
           </button>
-          <button
-            id="switch-2"
-            class="menuButton hidden"
-            type="button"
-            @click.prevent="calculateAndDispalyRoutes(false)"
-            title="Display pub crawl route"
-          >
-            Show Route
-          </button>
-          <button
-            id="switch-3"
-            class="menuButton hidden"
-            type="button"
-            @click.prevent="calculateAndDispalyRoutes(true)"
-            title="Optimize walking route between the pubs which is not start or end-pubs"
-          >
-            Optimize
-          </button>
-          <button
-            id="switch-4"
-            class="menuButton hidden"
-            @click="removeRoute()"
-            title="Remove displayed route from map"
-          >
-            Remove
-          </button>
         </div>
-        <ul>
-          <li
-            v-for="result in chosenArray"
-            :key="result.name"
-            :class="chosenTheme"
-          >
+        <ul v-if="hidden">
+          <li v-for="result in chosenArray" :key="result.name">
             <p @click="showPopup(result)">{{ result.name }}</p>
             <div class="order-pubs">
               <span class="material-icons" @click="moveUp(result)"
@@ -549,6 +525,40 @@ export default {
             </button>
           </li>
         </ul>
+        <div v-if="theme == 'maximized'">
+          <button
+            v-bind:disabled="chosenArray?.length == 0"
+            v-if="hidden"
+            id="switch-2"
+            class="menuButton"
+            type="button"
+            @click.prevent="calculateAndDispalyRoutes(false)"
+            title="Display pub crawl route"
+          >
+            Show Route
+          </button>
+          <button
+            v-bind:disabled="chosenArray?.length == 0"
+            v-if="hidden"
+            id="switch-3"
+            class="menuButton"
+            type="button"
+            @click.prevent="calculateAndDispalyRoutes(true)"
+            title="Optimize walking route between the pubs which is not start or end-pubs"
+          >
+            Optimize
+          </button>
+          <button
+            v-bind:disabled="chosenArray?.length == 0"
+            v-if="hidden"
+            id="switch-4"
+            class="menuButton"
+            @click="removeRoute()"
+            title="Remove displayed route from map"
+          >
+            Remove
+          </button>
+        </div>
       </div>
     </div>
   </section>

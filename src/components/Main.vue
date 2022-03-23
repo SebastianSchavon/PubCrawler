@@ -1,14 +1,13 @@
 <script>
 import { Point, Pub } from "./Objects.vue";
 export default {
-  // emits: ["addPub"],
   data: function () {
     return {
-      pubs: [], // Stores all the pub objects from the API response
-      // originPosition: null,
-      // defaultPubPic: "", //remove?
-      chosenArray: [], // Stores all the pub objects chosen by the user
-      // viewPubs: false,
+      pubs: [], // Stores all the pub objects from the API response.
+      chosenArray: [], // Stores all the pub objects chosen by the user.
+      pageArray: new Array(3), // Stores each page from API response.
+
+      // Variables below used by the different Google APIs
       map: null,
       googleSearchService: null,
       googleGeoCoder: null,
@@ -16,23 +15,29 @@ export default {
         preserveViewport: true,
       }),
       directionsService: new google.maps.DirectionsService(),
-      pubListVisible: true, // Used to control the textcontet of the HIDE/SHOW button
-      theme: "minimized", // Toggle list-sections minimized/maximized state
-      divList: "show-potentials", // Toggle between the 'near you' and 'chosen' divs
-      nearyouTheme: "closed", // Show/hidden state of menubuttons in the 'Pubs near you' div
-      chosenTheme: "closed", // Show/hidden state of menubuttons in the 'Chosen list' div
-      popupTheme: true, // Controls v-if on popup div
-      ifRatingExists: true, // If API response contains rating
-      ifPriceExists: true, // If API response containts a price class
-      ifImageExists: true, // If API response contains image
-      globalPopup: Pub, // Popup div to display clicked pub information
-      getNextPage: null, // Store 'Next Page Token' from API response
-      pageArray: new Array(3), // Stores each page from API response
-      pageCounter: 0, // Control which of the arrays in x-array to manipulate/display
-      // previousButton: document.querySelector("#previousButton"),
-      // nextButton: document.querySelector("#nextButton"),
-      // lastAddress: null,
-      hidden: true, // Controls v-if on menubuttons
+
+      pubListVisible: true, // Used to control the textcontet of the HIDE/SHOW button.
+
+      // Variables below control which class to be active at listSection and divList
+      listSectionTheme: "minimized",
+      divListTheme: "show-potentials",
+
+      // nearyoulistSectionTheme: "closed", // Show/Hidden state of menubuttons in the 'Pubs near you' div.
+      // chosenlistSectionTheme: "closed", // Show/hidden state of menubuttons in the 'Chosen list' div.
+
+      // Boolean values below checks if the API response contains rating, price and image-values.
+      ifRatingExists: true,
+      ifPriceExists: true,
+      ifImageExists: true,
+
+      // Boolean values below controls v-if states on menuButtons and the popup div.
+      menuButtonHidden: true,
+      popupDivHidden: true,
+
+      globalPopup: Pub, // Popup div which contains and displays a selected pub.
+      getNextPage: null, // Stores the 'Next Page Token' from the API response.
+
+      pageCounter: 0, // Control which of the arrays in pageArray to display/manipulate.
     };
   },
   mounted: function () {
@@ -69,9 +74,9 @@ export default {
     },
   },
   methods: {
+    // Initializes the visual map from Googles 'Maps Javascript API'
     initMap() {
       this.map = new google.maps.Map(document.getElementById("map"), {
-        // center: { lat: 57.70887, lng: 11.97456 },
         zoom: 14,
         disableDefaultUI: true,
         fullscreenControl: true,
@@ -81,6 +86,7 @@ export default {
       this.googleSearchService = new google.maps.places.PlacesService(this.map);
       this.googleGeoCoder = new google.maps.Geocoder();
     },
+    // Retrives coordinates from a user text-input search. Applies the cords to the GeoLocation method.
     async searchByName() {
       let request = {
         address: this.placeName,
@@ -95,8 +101,8 @@ export default {
           const locationLatLong = results[0].geometry.location;
           self.searchByGeoLocation(locationLatLong);
 
-          document.querySelector(".switch-button").textContent =
-            "Pubs near " + self.placeName;
+          document.querySelector("#response-title em").textContent =
+            self.placeName;
           self.resetPageButtons();
         } else {
           self.notifyUser("No place found");
@@ -113,6 +119,10 @@ export default {
       this.googleSearchService.textSearch(request, callback);
 
       const self = this;
+
+      /* The callback parameters is pre-declared by Google and contains the API response values.
+      Result contains the array with pubs, status the response-message and 
+      pageToken the string value to use with the next API request to get 20 more results. */
       function callback(results, status, pageToken) {
         self.pubs = [];
 
@@ -127,6 +137,7 @@ export default {
                 ? results[i].photos[0].getUrl({ maxHeight: 1000 })
                 : self.defaultPubPic;
 
+            // Push each pub to array as pub objects
             self.pubs.push(
               new Pub(
                 point,
@@ -154,7 +165,6 @@ export default {
           self.nearYouButton();
         }
 
-        // self.x[self.pageCounter] = new Array;
         // Stores each page results in an array. Store each array in an array.
         for (let i = 0; i < self.pubs.length; i++) {
           self.pageArray[self.pageCounter].push(self.pubs[i]);
@@ -249,63 +259,50 @@ export default {
         notifyUser("Geolocation is not supported by your browser");
       } else {
         navigator.geolocation.getCurrentPosition(success, error);
-        document.querySelector(".switch-button").textContent = "Pubs near you";
+        document.querySelector("#response-title em").textContent = "you";
         this.resetPageButtons();
       }
     },
     showAndHidePubs() {
       if (this.pubListVisible === true) {
         document.querySelector("#show-hide").textContent = "HIDE";
-        this.theme = "maximized";
+        this.listSectionTheme = "maximized";
         this.pubListVisible = false;
       } else {
         document.querySelector("#show-hide").textContent = "SHOW";
 
-        this.theme = "minimized";
+        this.listSectionTheme = "minimized";
         this.pubListVisible = true;
       }
     },
     forceShowPubs() {
       document.querySelector("#show-hide").textContent = "HIDE";
-      this.theme = "maximized";
+      this.listSectionTheme = "maximized";
       this.pubListVisible = false;
     },
     nearYouButton() {
       this.forceShowPubs();
-      this.divList = "show-potentials";
+      this.divListTheme = "show-potentials";
       document.querySelector("#response-list").classList.add("selected-list");
       document.querySelector("#chosen-list").classList.remove("selected-list");
 
-      this.hidden = false;
+      this.menuButtonHidden = false;
 
-      // document
-      //   .querySelectorAll("#chosen-list .menuButton")
-      //   .forEach((e) => e.classList.add("hidden"));
-      // document
-      //   .querySelectorAll("#response-list .menuButton")
-      //   .forEach((e) => e.classList.remove("hidden"));
-
-      this.chosenTheme = "closed";
-      this.nearyouTheme = "open";
+      // this.chosenlistSectionTheme = "closed";
+      // this.nearyoulistSectionTheme = "open";
     },
     chosenButton() {
-      this.hidden = true;
+      this.menuButtonHidden = true;
 
       this.forceShowPubs();
-      this.divList = "show-chosenones";
+      this.divListTheme = "show-chosenones";
       document
         .querySelector("#response-list")
         .classList.remove("selected-list");
       document.querySelector("#chosen-list").classList.add("selected-list");
-      // document
-      //   .querySelectorAll(".menuButton")
-      //   .forEach((e) => e.classList.remove("hidden"));
-      // document
-      //   .querySelectorAll("#response-list .menuButton")
-      //   .forEach((e) => e.classList.add("hidden"));
 
-      this.chosenTheme = "open";
-      this.nearyouTheme = "closed";
+      // this.chosenlistSectionTheme = "open";
+      // this.nearyoulistSectionTheme = "closed";
     },
     notifyUser(message) {
       const element = document.querySelector("#notification");
@@ -319,7 +316,7 @@ export default {
     },
     showPopup(result) {
       this.globalPopup = result;
-      this.popupTheme = false;
+      this.popupDivHidden = false;
 
       if (result.userRatings == 0) {
         this.ifRatingExists = false;
@@ -334,7 +331,8 @@ export default {
       }
     },
     hidePopup() {
-      this.popupTheme = true;
+      // Reset popup booleans
+      this.popupDivHidden = true;
       this.ifRatingExists = true;
       this.ifPriceExists = true;
       this.ifImageExists = true;
@@ -386,6 +384,7 @@ export default {
           type="search"
           placeholder="Find you target town"
           v-model="placeName"
+          autocomplete="off"
         />
         <button
           @click.prevent="searchByName()"
@@ -404,7 +403,7 @@ export default {
     </div>
     <div id="notification"></div>
   </section>
-  <section v-if="!popupTheme" id="popup-section">
+  <section v-if="!popupDivHidden" id="popup-section">
     <div class="popup">
       <button class="popup-close-button" @click="hidePopup(result)">✖</button>
       <p>
@@ -450,16 +449,22 @@ export default {
       />
     </div>
   </section>
-  <section id="list-section" :class="theme">
+  <section id="list-section" :class="listSectionTheme">
     <div id="show-hide" class="beer-colored" @click="showAndHidePubs()">
       SHOW
     </div>
-    <div id="div-list" :class="divList">
+    <div id="div-list" :class="divListTheme">
       <div id="response-list" class="list">
-        <button class="switch-button" @click="nearYouButton(this)">
-          Pubs near you
+        <button
+          id="response-title"
+          class="switch-button"
+          @click="nearYouButton(this)"
+        >
+          <p>
+            Pubs near <em><b>you</b></em>
+          </p>
         </button>
-        <ul v-if="!hidden">
+        <ul v-if="!menuButtonHidden">
           <li v-for="result in pageArray[pageCounter]" :key="result.name">
             <div class="icon-name">
               <i
@@ -475,20 +480,18 @@ export default {
             <button class="add-remove-button" @click="addPub(result)">+</button>
           </li>
         </ul>
-        <div v-if="theme == 'maximized'">
+        <div v-if="listSectionTheme == 'maximized'">
           <button
-            v-if="!hidden"
+            v-if="!menuButtonHidden"
             v-bind:disabled="pageCounter == 0"
             @click="pageCounter--"
             id="previousButton"
             class="menuButton"
           >
-           <span class="material-icons-outlined">
-chevron_left
-</span>
+            <span class="material-icons-outlined"> chevron_left </span>
           </button>
           <button
-            v-if="!hidden"
+            v-if="!menuButtonHidden"
             @click="nextPage()"
             v-bind:disabled="
               !pageArray[pageCounter + 1] ||
@@ -497,19 +500,17 @@ chevron_left
             id="nextButton"
             class="menuButton"
           >
-            <span class="material-icons-outlined">
-chevron_right
-</span>
+            <span class="material-icons-outlined"> chevron_right </span>
           </button>
         </div>
       </div>
       <div id="chosen-list" class="list">
         <div id="switch-buttons">
           <button id="switch-1" class="switch-button" @click="chosenButton()">
-            Planned Crawl
+            <p>Planned Crawl</p>
           </button>
         </div>
-        <ul v-if="hidden">
+        <ul v-if="menuButtonHidden">
           <li v-for="result in chosenArray" :key="result.name">
             <p @click="showPopup(result)">{{ result.name }}</p>
             <div class="order-pubs">
@@ -525,10 +526,10 @@ chevron_right
             </button>
           </li>
         </ul>
-        <div v-if="theme == 'maximized'">
+        <div v-if="listSectionTheme == 'maximized'">
           <button
             v-bind:disabled="chosenArray?.length == 0"
-            v-if="hidden"
+            v-if="menuButtonHidden"
             id="switch-2"
             class="menuButton"
             type="button"
@@ -539,7 +540,7 @@ chevron_right
           </button>
           <button
             v-bind:disabled="chosenArray?.length == 0"
-            v-if="hidden"
+            v-if="menuButtonHidden"
             id="switch-3"
             class="menuButton"
             type="button"
@@ -550,7 +551,7 @@ chevron_right
           </button>
           <button
             v-bind:disabled="chosenArray?.length == 0"
-            v-if="hidden"
+            v-if="menuButtonHidden"
             id="switch-4"
             class="menuButton"
             @click="removeRoute()"

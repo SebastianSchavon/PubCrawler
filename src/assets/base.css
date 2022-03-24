@@ -422,6 +422,7 @@ input:-webkit-autofill:focus {
 
   #response-list ul {
     max-height: 45vh;
+    min-height: 40vh;
   }
 
   #chosen-list {
@@ -432,6 +433,7 @@ input:-webkit-autofill:focus {
 
   #chosen-list ul {
     max-height: 45vh;
+    min-height: 40vh;
   }
 
   .minimized {
@@ -440,7 +442,7 @@ input:-webkit-autofill:focus {
   }
 
   .maximized {
-    height: 71%;
+    height: 80%;
     transition: 0.2s;
   }
 

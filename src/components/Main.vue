@@ -3,27 +3,16 @@ import { Point, Pub } from "./Objects.vue";
 export default {
   data: function () {
     return {
-      pubs: [], // Stores all the pub objects from the API response.
-      chosenArray: [], // Stores all the pub objects chosen by the user.
-      pageArray: new Array(3), // Stores each page from API response.
-
-      // Variables below used by the different Google APIs
-      map: null,
-      googleSearchService: null,
-      googleGeoCoder: null,
-      directionsRenderer: new google.maps.DirectionsRenderer({
-        preserveViewport: true,
-      }),
-      directionsService: new google.maps.DirectionsService(),
-
-      pubListVisible: true, // Used to control the textcontet of the HIDE/SHOW button.
+      // Stores all the pub objects from the API response.
+      pubs: [],
+      // Stores all the pub objects chosen by the user.
+      chosenArray: [],
+      // Stores each page from API response.
+      pageArray: new Array(3),
 
       // Variables below control which class to be active at listSection and divList
       listSectionTheme: "minimized",
       divListTheme: "show-potentials",
-
-      // nearyoulistSectionTheme: "closed", // Show/Hidden state of menubuttons in the 'Pubs near you' div.
-      // chosenlistSectionTheme: "closed", // Show/hidden state of menubuttons in the 'Chosen list' div.
 
       // Boolean values below checks if the API response contains rating, price and image-values.
       ifRatingExists: true,
@@ -34,16 +23,41 @@ export default {
       menuButtonHidden: true,
       popupDivHidden: true,
 
-      globalPopup: Pub, // Popup div which contains and displays a selected pub.
-      getNextPage: null, // Stores the 'Next Page Token' from the API response.
+      // Popup div which contains and displays a selected pub.
+      globalPopup: Pub,
 
-      pageCounter: 0, // Control which of the arrays in pageArray to display/manipulate.
+      // Stores the 'Next Page Token' from the API response.
+      getNextPage: null,
+
+      // Control which of the arrays in pageArray to display/manipulate.
+      pageCounter: 0,
+
+      // Show/Hide button textcontent
+      showHide: "SHOW",
+      
+      // Used to control the textcontet of the HIDE/SHOW button.
+      pubListVisible: true,
+
+      // Google API objects below
+      map: null,
+
+      // Will contain googles PlacesService and Geocoder class after pageload
+      googleSearchService: null,
+      googleGeoCoder: null,
+
+      // Renders the results from directionsService
+      directionsRenderer: new google.maps.DirectionsRenderer({
+        preserveViewport: true,
+      }),
+      // Communicates with googles Directions Service which receives direction requests and returns an efficient path.
+      directionsService: new google.maps.DirectionsService(),
     };
   },
   mounted: function () {
     this.initMap();
     this.geoLocate();
 
+    // Retrieves the list of chosen pubs from users localstorage.
     if (localStorage.getItem("chosenArray")) {
       try {
         let temp = JSON.parse(localStorage.getItem("chosenArray"));
@@ -65,6 +79,7 @@ export default {
     }
   },
   watch: {
+    // Stores the chosenArray on users localstorage
     chosenArray: {
       handler(newChosenArray) {
         const parsed = JSON.stringify(newChosenArray);
@@ -74,8 +89,8 @@ export default {
     },
   },
   methods: {
-    // Initializes the visual map from Googles 'Maps Javascript API'
     initMap() {
+      // Initializes the visual map from Googles 'Maps Javascript API'
       this.map = new google.maps.Map(document.getElementById("map"), {
         zoom: 14,
         disableDefaultUI: true,
@@ -83,7 +98,11 @@ export default {
       });
 
       this.directionsRenderer.setMap(this.map);
+
+      // PlacesService contains methods related to searching for places and retrieving details about a place.
       this.googleSearchService = new google.maps.places.PlacesService(this.map);
+
+      // Geocoding is the process of converting addresses into geographic coordinates
       this.googleGeoCoder = new google.maps.Geocoder();
     },
     // Retrives coordinates from a user text-input search. Applies the cords to the GeoLocation method.
@@ -103,6 +122,7 @@ export default {
 
           document.querySelector("#response-title em").textContent =
             self.placeName;
+
           self.resetPageButtons();
         } else {
           self.notifyUser("No place found");
@@ -121,8 +141,8 @@ export default {
       const self = this;
 
       /* The callback parameters is pre-declared by Google and contains the API response values.
-      Result contains the array with pubs, status the response-message and 
-      pageToken the string value to use with the next API request to get 20 more results. */
+      'result' contains the array with pubs, 'status' the response-message and 
+      'pageToken' the string value to be used when requesting 20 more results */
       function callback(results, status, pageToken) {
         self.pubs = [];
 
@@ -193,9 +213,12 @@ export default {
         }
       }
     },
+    // Displays the chosenArray pubs on the map with markers and route.
     async calculateAndDispalyRoutes(optimizeRoute = false) {
       const waypts = [];
 
+      /* The route is between the first and the last element of the array as origin and destination. The remaning elements is set as 
+      waypoints in between */
       for (let i = 1; i < this.chosenArray.length - 1; i++) {
         waypts.push({
           location: { placeId: this.chosenArray[i].googleId },
@@ -223,6 +246,8 @@ export default {
               self.moveItem(from, i);
             }
           }
+
+          // Changes each markers textcontent on the map. From marker-adress to the pub-name.
           for (let i = 0; i < response.routes[0].legs.length; i++) {
             response.routes[0].legs[i].end_address =
               self.chosenArray[i + 1].name;
@@ -238,6 +263,7 @@ export default {
       // Clear route from map
       this.directionsRenderer.set("directions", null);
     },
+    // Find users location via Geolocation
     geoLocate() {
       let self = this;
 
@@ -246,7 +272,7 @@ export default {
           position.coords.latitude,
           position.coords.longitude
         );
-        // self.originPosition = position;
+        
         self.moveMapTo(position);
         self.searchByGeoLocation(position);
       }
@@ -265,18 +291,18 @@ export default {
     },
     showAndHidePubs() {
       if (this.pubListVisible === true) {
-        document.querySelector("#show-hide").textContent = "HIDE";
+        this.showHide = "HIDE";
         this.listSectionTheme = "maximized";
         this.pubListVisible = false;
       } else {
         document.querySelector("#show-hide").textContent = "SHOW";
-
+        this.showHide = "SHOW";
         this.listSectionTheme = "minimized";
         this.pubListVisible = true;
       }
     },
     forceShowPubs() {
-      document.querySelector("#show-hide").textContent = "HIDE";
+      this.showHide = "HIDE";
       this.listSectionTheme = "maximized";
       this.pubListVisible = false;
     },
@@ -287,9 +313,6 @@ export default {
       document.querySelector("#chosen-list").classList.remove("selected-list");
 
       this.menuButtonHidden = false;
-
-      // this.chosenlistSectionTheme = "closed";
-      // this.nearyoulistSectionTheme = "open";
     },
     chosenButton() {
       this.menuButtonHidden = true;
@@ -300,9 +323,6 @@ export default {
         .querySelector("#response-list")
         .classList.remove("selected-list");
       document.querySelector("#chosen-list").classList.add("selected-list");
-
-      // this.chosenlistSectionTheme = "open";
-      // this.nearyoulistSectionTheme = "closed";
     },
     notifyUser(message) {
       const element = document.querySelector("#notification");
@@ -451,7 +471,7 @@ export default {
   </section>
   <section id="list-section" :class="listSectionTheme">
     <div id="show-hide" class="beer-colored" @click="showAndHidePubs()">
-      SHOW
+      {{ showHide }}
     </div>
     <div id="div-list" :class="divListTheme">
       <div id="response-list" class="list">

@@ -46,11 +46,11 @@ export default {
       googleGeoCoder: null,
 
       // Renders the results from directionsService
-      directionsRenderer: new google.maps.DirectionsRenderer({
+      directionsRenderer: new window.google.maps.DirectionsRenderer({
         preserveViewport: true,
       }),
       // Communicates with googles Directions Service which receives direction requests and returns an efficient path.
-      directionsService: new google.maps.DirectionsService(),
+      directionsService: new window.google.maps.DirectionsService(),
     };
   },
   mounted: function () {
@@ -91,7 +91,8 @@ export default {
   methods: {
     initMap() {
       // Initializes the visual map from Googles 'Maps Javascript API'
-      this.map = new google.maps.Map(document.getElementById("map"), {
+      this.map = new window.google.maps.Map(document.getElementById("map"), {
+        center: { lat: 57.708870, lng: 11.974560 },
         zoom: 14,
         disableDefaultUI: true,
         fullscreenControl: true,
@@ -100,10 +101,10 @@ export default {
       this.directionsRenderer.setMap(this.map);
 
       // PlacesService contains methods related to searching for places and retrieving details about a place.
-      this.googleSearchService = new google.maps.places.PlacesService(this.map);
+      this.googleSearchService = new window.google.maps.places.PlacesService(this.map);
 
       // Geocoding is the process of converting addresses into geographic coordinates
-      this.googleGeoCoder = new google.maps.Geocoder();
+      this.googleGeoCoder = new window.google.maps.Geocoder();
     },
     // Retrives coordinates from a user text-input search. Applies the cords to the GeoLocation method.
     async searchByName() {

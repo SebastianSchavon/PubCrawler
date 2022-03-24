@@ -256,12 +256,12 @@ li:nth-child(even) {
   padding-right: 1rem;
 }
 
-#chosen-list ul li:last-child div:before {
+#chosen-list ul li:last-child div div:before {
   content: "End";
   font-family: "Playfair Display", serif;
 }
 
-#chosen-list ul li:first-child div:before {
+#chosen-list ul li:first-child div div:before {
   content: "Start";
   font-family: "Playfair Display", serif;
 }
@@ -366,6 +366,10 @@ input:-webkit-autofill:focus {
   margin: 4px;
 }
 
+.end-start{
+  margin-left: 1rem;
+}
+
 
 @media (max-width: 550px) {
   #response-list ul li {
@@ -442,6 +446,10 @@ input:-webkit-autofill:focus {
 
   .add-remove-button {
     margin: 0;
+  }
+
+  .end-start{
+    margin-left: 0;
   }
 }
 

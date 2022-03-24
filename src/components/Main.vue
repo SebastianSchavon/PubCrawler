@@ -272,7 +272,7 @@ export default {
           position.coords.latitude,
           position.coords.longitude
         );
-        
+
         self.moveMapTo(position);
         self.searchByGeoLocation(position);
       }
@@ -421,6 +421,7 @@ export default {
         </button>
       </form>
     </div>
+    
     <div id="notification"></div>
   </section>
   <section v-if="!popupDivHidden" id="popup-section">
@@ -540,6 +541,7 @@ export default {
               <span class="material-icons" @click="moveDown(result)"
                 >expand_more</span
               >
+              <div class="end-start"></div>
             </div>
             <button class="add-remove-button" @click="removePub(result)">
               -

@@ -476,8 +476,8 @@ input:-webkit-autofill:focus {
   }
 }
 
-@media(max-height:742px){
+@media(max-height:900px){
   .maximized{
-    height: 75%;
+    height: 80%;
   }
 }

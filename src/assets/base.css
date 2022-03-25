@@ -363,6 +363,7 @@ input:-webkit-autofill:focus {
 }
 
 #switch-1 p{
+  color: black;
   margin: 4px;
 }
 

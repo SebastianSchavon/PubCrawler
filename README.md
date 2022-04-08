@@ -1,5 +1,5 @@
 ## PubCrawler
-###Find and plan a pub crawling route! 
+Find and plan a pub crawling route! 
 
 Vue Build Tools application. Using Googles Geocoding API, Directions API, Places API and Maps Javascript API. 
 

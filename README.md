@@ -1,4 +1,4 @@
-Vue Build Tools application. Using Googles Geocoding API, Directions API, Places API and Maps Javascript API. 
+## Vue Build Tools application. Using Googles Geocoding API, Directions API, Places API and Maps Javascript API. 
 
 # PubCrawler
 Find and plan a pub crawling route! 

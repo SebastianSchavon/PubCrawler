@@ -6,7 +6,7 @@ The user recieves a list of pubs, nearby given (Google place search) or current 
 
 Vue Build Tools application. Using Googles Geocoding API, Directions API, Places API and Maps Javascript API. 
 
-![AnimationWPFDONE1](https://user-images.githubusercontent.com/91784084/164287726-1a655876-5495-4479-a19d-b854edacad1a.gif)
+![AnimationVue](https://user-images.githubusercontent.com/91784084/164238843-46a36991-52d4-4530-b5ee-2e19e97e181d.gif)
 
 
 
